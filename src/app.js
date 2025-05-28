@@ -10,6 +10,7 @@ connectDB();
 
 // Middleware
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Rutas
 const rutaDiscriminacion = require('../src/routers/discriminacion');

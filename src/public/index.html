@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subir Audio</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2rem;
+    }
+    input, button {
+      margin-top: 1rem;
+      display: block;
+    }
+    #respuesta {
+      margin-top: 1rem;
+      white-space: pre-wrap;
+      background: #f0f0f0;
+      padding: 1rem;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Subir Audio</h1>
+
+  <input type="file" id="audioInput" accept="audio/*">
+  <button onclick="subirAudio()">Subir</button>
+
+  <div id="respuesta"></div>
+  <audio id="reproductor" controls style="margin-top: 1rem; display: none;"></audio>
+
+  <script>
+    async function subirAudio() {
+      const archivo = document.getElementById('audioInput').files[0];
+      const respuestaDiv = document.getElementById('respuesta');
+      const reproductor = document.getElementById('reproductor');
+
+      if (!archivo) {
+        respuestaDiv.textContent = 'Por favor seleccioná un archivo.';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('audio', archivo);
+
+      try {
+        const res = await fetch('http://localhost:3000/discriminacion/subir', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const texto = await res.text();
+        respuestaDiv.textContent = `Estado: ${res.status}\n\nRespuesta:\n${texto}`;
+
+        // Si tiene un ID, asumimos que fue exitoso
+        if (res.status === 201 && texto.includes('"id"')) {
+          const json = JSON.parse(texto);
+          const id = json.id;
+
+          // Reproducir automáticamente el audio cargado
+          reproductor.src = `http://localhost:3000/discriminacion/${id}`;
+          reproductor.style.display = 'block';
+        }
+      } catch (err) {
+        console.error(err);
+        respuestaDiv.textContent = 'Error al subir el archivo.';
+      }
+    }
+  </script>
+</body>
+</html>
