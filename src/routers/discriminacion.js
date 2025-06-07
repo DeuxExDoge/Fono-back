@@ -14,8 +14,8 @@ router.post('/subir', upload.single('audio'), async (req, res) => {
       tipo: req.file.mimetype,
     });
 
-    await nuevoAudio.save();
-    res.status(201).send('Audio guardado exitosamente');
+    const guardado = await nuevoAudio.save();
+    res.status(201).json({ id: guardado._id, mensaje: 'Audio guardado exitosamente' });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error al guardar el audio');

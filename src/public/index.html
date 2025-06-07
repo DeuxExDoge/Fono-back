@@ -50,12 +50,11 @@
           body: formData,
         });
 
-        const texto = await res.text();
-        respuestaDiv.textContent = `Estado: ${res.status}\n\nRespuesta:\n${texto}`;
+        const json = await res.json();
+        respuestaDiv.textContent = `Estado: ${res.status}\n\nRespuesta:\n${JSON.stringify(json, null, 2)}`;
 
         // Si tiene un ID, asumimos que fue exitoso
-        if (res.status === 201 && texto.includes('"id"')) {
-          const json = JSON.parse(texto);
+        if (res.status === 201 && json.id) {
           const id = json.id;
 
           // Reproducir automáticamente el audio cargado
